@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#3b82f6">
+  <title>تعال لم الفاتك | PDF + صور + فيديو | م/ الطيب الرشيد</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://unpkg.com/tesseract.js@5.0.5/dist/tesseract.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <style>
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    body { font-family: 'Cairo', 'Tahoma', sans-serif; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); min-height: 100vh; padding-bottom: 80px; }
+    .card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 16px; transition: all 0.2s; }
+    
+    /* اللون الأزرق الجديد بدل البرتقالي */
+    .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 14px; border-radius: 16px; font-weight: 600; width: 100%; border: none; cursor: pointer; transition: 0.2s; }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-outline { border: 2px solid #3b82f6; color: #3b82f6; padding: 12px; border-radius: 14px; background: transparent; cursor: pointer; font-weight: 500; }
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 14px; border-radius: 16px; font-weight: 600; width: 100%; border: none; cursor: pointer; }
+    input, select, textarea { border: 2px solid #e5e7eb; border-radius: 14px; padding: 14px; width: 100%; margin-bottom: 12px; font-family: 'Cairo', sans-serif; font-size: 16px; }
+    input:focus, select:focus, textarea:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); backdrop-filter: blur(10px); background: rgba(255,255,255,0.95); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; padding: 8px; color: #6b7280; background: none; border: none; cursor: pointer; border-radius: 40px; transition: 0.2s; font-size: 12px; }
+    .nav-item.active { color: #3b82f6; font-weight: 600; background: #eff6ff; }
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150%); background: #1f2937; color: white; padding: 12px 24px; border-radius: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; transition: transform 0.3s ease; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+    .result-box { background: #f8fafc; border-radius: 16px; padding: 16px; margin-top: 12px; border-right: 4px solid #3b82f6; }
+    .tool-badge { display: inline-block; padding: 4px 10px; border-radius: 30px; font-size: 11px; margin-right: 8px; font-weight: bold; }
+    .tool-gemini { background: #4285f4; color: white; }
+    .tool-deepseek { background: #1e2a5e; color: white; }
+    .tool-claude { background: #d97706; color: white; }
+    .upload-area { border: 2px dashed #cbd5e1; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; background: #fafafa; }
+    .upload-area:hover { border-color: #3b82f6; background: #eff6ff; }
+    .media-preview { max-width: 100%; max-height: 200px; border-radius: 16px; margin-top: 12px; }
+    .quick-questions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .quick-question { background: #eff6ff; padding: 8px 16px; border-radius: 30px; font-size: 12px; cursor: pointer; transition: 0.2s; color: #1e40af; }
+    .quick-question:active { background: #3b82f6; color: white; }
+    
+    /* تصميم اسم المطور */
+    .developer-signature {
+      text-align: center;
+      margin-top: 12px;
+      padding: 12px;
+      border-top: 1px solid rgba(59,130,246,0.3);
+      background: linear-gradient(135deg, rgba(59,130,246,0.05), rgba(37,99,235,0.02));
+      border-radius: 20px;
+    }
+    .developer-name {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      padding: 8px 20px;
+      border-radius: 50px;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 4px 15px rgba(59,130,246,0.3);
+      transition: 0.3s;
+    }
+    .developer-name i {
+      font-size: 18px;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.2);
+      padding: 5px 12px;
+      border-radius: 40px;
+      font-size: 12px;
+      backdrop-filter: blur(4px);
+    }
+    .gender-option.selected { border-color: #3b82f6 !important; background: #eff6ff; transform: scale(0.98); }
+    .funny-message-box {
+      background: #eff6ff;
+      border-radius: 20px;
+      padding: 12px;
+      margin-top: 16px;
+      text-align: center;
+      border-right: 4px solid #3b82f6;
+      animation: bounce 0.5s ease;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    
+    /* رأس الصفحة باللون الأزرق */
+    .blue-header {
+      background: linear-gradient(135deg, #3b82f6, #1e40af);
+    }
+    .progress-fill { background: #3b82f6; }
+    .motivation-text { color: #3b82f6; background: #eff6ff; }
+    .term-card { background: #eff6ff; border-right-color: #3b82f6; }
+    
+    @media (max-width: 480px) { .card { padding: 16px; } .nav-item span { font-size: 10px; } .nav-item i { font-size: 20px; } .developer-name { padding: 6px 16px; font-size: 12px; } }
+  </style>
+</head>
+<body class="p-3">
+
+<!-- شاشة تسجيل الدخول -->
+<div id="authScreen" class="min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+    <div class="text-center mb-6">
+      <div class="inline-block p-3 bg-gradient-to-r from-blue-500 to-blue-700 rounded-2xl mb-3">
+        <i class="fas fa-brain text-4xl text-white"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-blue-600">🤖 تعال لم الفاتك</h2>
+      <p class="text-gray-500">يدعم: PDF | صور | فيديو | أسئلة</p>
+      <div class="mt-3 developer-signature" style="border-top: none; background: none;">
+        <div class="developer-name" style="background: linear-gradient(135deg, #3b82f6, #2563eb); padding: 6px 16px; display: inline-flex;">
+          <i class="fas fa-code"></i>
+          <span>م/ الطيب الرشيد</span>
+          <i class="fas fa-crown"></i>
+        </div>
+      </div>
+    </div>
+    <input type="text" id="loginName" placeholder="شنو اسمك؟" class="p-3 text-center">
+    <div class="mb-4">
+      <div class="flex gap-3">
+        <div onclick="selectGender('male')" id="genderMale" class="gender-option flex-1 text-center p-3 rounded-xl border-2 border-gray-200 cursor-pointer transition">
+          <i class="fas fa-mars text-2xl text-blue-500"></i>
+          <p class="font-bold mt-1">ولد</p>
+        </div>
+        <div onclick="selectGender('female')" id="genderFemale" class="gender-option flex-1 text-center p-3 rounded-xl border-2 border-gray-200 cursor-pointer transition">
+          <i class="fas fa-venus text-2xl text-pink-500"></i>
+          <p class="font-bold mt-1">بنت</p>
+        </div>
+      </div>
+    </div>
+    <button onclick="login()" class="btn-primary">
+      <i class="fas fa-sign-in-alt"></i> خش ي مهمل ي منعدم الشغف
+    </button>
+    
+    <div id="funnyMessage" class="funny-message-box mt-4">
+      <i class="fas fa-smile-wink text-blue-500"></i>
+      <span class="text-sm text-gray-700">اختار جنسك وادخل</span>
+    </div>
+  </div>
+</div>
+
+<div id="mainApp" class="hidden max-w-lg mx-auto">
+  <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-5 rounded-3xl shadow-xl mb-4">
+    <div class="flex justify-between items-center flex-wrap gap-2">
+      <div>
+        <h1 class="text-xl font-bold">🤖 تعال لم الفاتك</h1>
+        <p class="text-white/80 text-xs" id="welcomeUser"></p>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="header-badge">
+          <i class="fas fa-user-check"></i>
+          <span class="text-xs">م/ الطيب الرشيد</span>
+        </div>
+        <div id="toolStatus" class="bg-white/20 px-2 py-1 rounded-full text-xs"><i class="fas fa-microchip"></i> جاهز</div>
+        <button onclick="logout()" class="bg-red-500/30 px-3 py-1.5 rounded-full text-sm">خروج</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- الصفحة الرئيسية -->
+  <section id="pdfAssistantSection" class="tab-content">
+    <div class="card">
+      <h2 class="font-bold mb-3 text-center text-xl text-blue-600">📎 محلل المحتوى الذكي</h2>
+      <p class="text-center text-gray-600 text-sm mb-3">ارفع: PDF | صورة | فيديو | أو اكتب سؤالاً</p>
+      
+      <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <i class="fas fa-cloud-upload-alt text-3xl text-blue-500 mb-2"></i>
+        <p class="text-sm text-gray-500">اضغط لرفع ملف (PDF، صورة، فيديو)</p>
+        <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.gif,.mp4,.mov,.webm" class="hidden" onchange="handleFileUpload(event)">
+      </div>
+      
+      <div class="quick-questions">
+        <div class="quick-question" onclick="askQuickQuestion('لخص المحتوى')">📝 لخص المحتوى</div>
+        <div class="quick-question" onclick="askQuickQuestion('ما هي النقاط الرئيسية؟')">⭐ النقاط الرئيسية</div>
+        <div class="quick-question" onclick="askQuickQuestion('اشرح المصطلحات الصعبة')">📖 شرح المصطلحات</div>
+        <div class="quick-question" onclick="askQuickQuestion('اكتب أسئلة اختبار')">📝 أسئلة اختبار</div>
+      </div>
+      
+      <div id="progressContainer" class="hidden mb-3">
+        <div class="flex justify-between text-sm mb-1"><span>جاري المعالجة...</span><span id="progressPercent">0%</span></div>
+        <div class="w-full bg-gray-200 rounded-full h-2"><div id="progressBar" class="bg-blue-500 h-2 rounded-full transition-all" style="width: 0%"></div></div>
+      </div>
+      
+      <div id="processingStatus" class="hidden text-center py-2"><div class="loading-spinner"></div><p class="text-sm mt-2">جاري التحليل...</p></div>
+      
+      <div id="mediaPreview" class="hidden mt-3 text-center"></div>
+      
+      <div id="analysisResults" class="hidden">
+        <div class="result-box mb-3 bg-gray-100"><h3 class="font-bold"><i class="fas fa-robot"></i> الأداة المستخدمة</h3><p id="usedTool" class="text-sm"></p></div>
+        <div class="result-box mb-3 bg-green-50"><div class="flex justify-between items-center"><h3 class="font-bold text-green-700"><i class="fas fa-language"></i> التحليل والترجمة</h3><button onclick="copyText('analysisContent')" class="text-xs"><i class="fas fa-copy"></i> نسخ</button></div><div id="analysisContent" class="text-sm leading-relaxed max-h-96 overflow-y-auto mt-2"></div></div>
+        <div class="result-box mb-3 bg-blue-50"><h3 class="font-bold text-blue-700"><i class="fas fa-olive-branch"></i> الزيتوته (تلخيص علمي)</h3><div id="zaitootaSummary" class="text-sm leading-relaxed"></div></div>
+        <div class="result-box bg-gray-50"><h3 class="font-bold mb-2"><i class="fas fa-chart-bar"></i> معلومات الملف</h3><div id="fileStats" class="text-sm"></div></div>
+      </div>
+      
+      <div class="mt-4">
+        <h3 class="font-bold mb-2 text-blue-600"><i class="fas fa-comments text-blue-500"></i> اسأل عن المحتوى</h3>
+        <div id="chatHistory" class="h-48 overflow-y-auto mb-3 space-y-2 p-2 bg-gray-50 rounded-xl">
+          <div class="bg-white p-2 rounded-lg text-sm">👋 أهلاً! ارفع ملف أو اكتب سؤالك</div>
+        </div>
+        <div class="flex gap-2">
+          <input type="text" id="chatInput" placeholder="اكتب سؤالك..." class="flex-1 p-3 rounded-xl border-2 text-sm" onkeypress="if(event.key==='Enter') askQuestion()">
+          <button onclick="askQuestion()" class="btn-primary px-4 py-3 w-auto"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card"><h3 class="font-bold mb-2 text-blue-600">📚 ملفاتي السابقة</h3><div id="pdfsList" class="space-y-2"></div></div>
+    
+    <div class="developer-signature">
+      <div class="developer-name">
+        <i class="fas fa-code"></i>
+        <span>تطوير: م/ الطيب الرشيد</span>
+        <i class="fas fa-crown"></i>
+      </div>
+      <p class="text-xs text-gray-400 mt-2">© 2025 | جميع الحقوق محفوظة</p>
+    </div>
+  </section>
+
+  <!-- باقي الأقسام -->
+  <section id="researchSection" class="tab-content hidden"><div class="card"><h2 class="font-bold text-blue-600">📝 اكتب لي البحث</h2><form onsubmit="event.preventDefault(); generateResearch();"><input type="text" id="researchTitle" placeholder="عنوان البحث" required><input type="number" id="researchPages" placeholder="عدد الصفحات" required><input type="number" id="researchReferences" placeholder="عدد المراجع" required><textarea id="researchTopic" placeholder="وصف الموضوع" rows="3"></textarea><button type="submit" class="btn-success">أنشئ البحث</button></form><div id="researchResult" class="hidden mt-3"><div id="researchContent" class="result-box"></div><button onclick="downloadResearchPDF()" class="btn-primary mt-2 text-sm">📥 تحميل PDF</button></div><div class="developer-signature mt-3"><div class="developer-name" style="padding: 6px 16px; font-size: 12px;"><i class="fas fa-code"></i><span>م/ الطيب الرشيد</span></div></div></div></section>
+  <section id="subjectsSection" class="tab-content hidden"><div class="card"><h2 class="font-bold text-blue-600">➕ مواد</h2><form onsubmit="event.preventDefault(); addSubject();"><input type="text" id="subjectName" placeholder="اسم المادة" required><input type="color" id="subjectColor" value="#3b82f6"><button type="submit" class="btn-primary">إضافة</button></form><div id="subjectsList"></div><div class="developer-signature mt-3"><div class="developer-name" style="padding: 6px 16px; font-size: 12px;"><i class="fas fa-code"></i><span>م/ الطيب الرشيد</span></div></div></div></section>
+  <section id="studySection" class="tab-content hidden"><div class="card"><h2 class="font-bold text-blue-600">📚 جدول المذاكرة</h2><form onsubmit="event.preventDefault(); addStudyPlan();"><select id="studySubjectSelect" required><option value="">اختر المادة</option></select><input type="number" id="studyDaysGap" placeholder="كل كم يوم؟" required><input type="number" id="studyHoursPerDay" placeholder="ساعات/اليوم" step="0.5" required><button type="submit" class="btn-primary">أضف خطة</button></form><div id="studyPlansList" class="mt-3"></div><canvas id="studyChart" height="120"></canvas><div class="developer-signature mt-3"><div class="developer-name" style="padding: 6px 16px; font-size: 12px;"><i class="fas fa-code"></i><span>م/ الطيب الرشيد</span></div></div></div></section>
+  <section id="statsSection" class="tab-content hidden"><div class="card"><h2 class="font-bold text-blue-600">📊 إحصائيات</h2><div id="statsContent"></div><button onclick="exportAllData()" class="btn-outline w-full mt-2">📥 تصدير</button><button onclick="resetAllData()" class="btn-outline text-red-500 mt-2">🗑️ حذف الكل</button><div class="developer-signature mt-3"><div class="developer-name" style="padding: 6px 16px; font-size: 12px;"><i class="fas fa-code"></i><span>م/ الطيب الرشيد</span></div></div></div></section>
+</div>
+
+<nav class="bottom-nav">
+  <button onclick="showTab('pdfAssistant')" class="nav-item active"><i class="fas fa-file-alt"></i><span>الرئيسية</span></button>
+  <button onclick="showTab('research')" class="nav-item"><i class="fas fa-pen-fancy"></i><span>بحث</span></button>
+  <button onclick="showTab('subjects')" class="nav-item"><i class="fas fa-book"></i><span>مواد</span></button>
+  <button onclick="showTab('study')" class="nav-item"><i class="fas fa-calendar-check"></i><span>مذاكرة</span></button>
+  <button onclick="showTab('stats')" class="nav-item"><i class="fas fa-chart-line"></i><span>إحصائيات</span></button>
+</nav>
+
+<script>
+  const WORKER_URL = "https://sparkling-field-b7afrehab.tabbby124.workers.dev/";
+  
+  let currentUser = null, selectedGender = null;
+  let subjects = [], pdfFiles = [], sessions = [], studyPlans = [], studyChart;
+  let currentContent = "";
+  let currentFileType = "";
+  let usageStats = { gemini: 0, deepseek: 0, claude: 0 };
+  
+  const motivationQuotes = ["💪 واصل! أنت تقترب!", "🌟 خطوة بخطوة!", "📚 النجاح ينتظرك!", "🔥 شد حيلك!", "⭐ أنت تستطيع!"];
+  function getRandomMotivation() { return motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)]; }
+  
+  function getFunnyMessage(gender) {
+    if (gender === 'male') return "أيوه يا زول! شد حيلك 😎";
+    if (gender === 'female') return "تعالي يا حبوبة! ورينا شطارتك 😘";
+    return "اختار جنسك وادخل 🎭";
+  }
+  
+  function getWelcomeMessage(name, gender) {
+    if (gender === 'male') {
+      return `🎉 أول م جيت هنا افصلا من الجكس عشان كاتمه ي فردة ${name} 🥲💔 الحنك ملحوق كمل مذاكرتك عشان م تلقي الـF منورة في البورت!`;
+    } else {
+      return `🌸 ي تجتهدي وتقري ي البلولة ود عمك ي ${name} قاعد علي الهبشة 😂💕`;
+    }
+  }
+  
+  function selectGender(g) {
+    selectedGender = g;
+    document.getElementById('genderMale').classList.toggle('selected', g === 'male');
+    document.getElementById('genderFemale').classList.toggle('selected', g === 'female');
+    const funnyMsg = getFunnyMessage(g);
+    document.getElementById('funnyMessage').innerHTML = `<i class="fas fa-${g === 'male' ? 'mars' : 'venus'} text-blue-500"></i> <span class="text-sm text-gray-700">${funnyMsg}</span>`;
+  }
+  
+  async function callWorker(model, prompt, type = 'general') {
+    const maxLength = 2000;
+    const shortenedPrompt = prompt.length > maxLength ? prompt.substring(0, maxLength) + "..." : prompt;
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model, prompt: shortenedPrompt, type })
+    });
+    if (!response.ok) throw new Error(`Worker returned ${response.status}`);
+    const data = await response.json();
+    if (data.result) return data.result;
+    if (data.reply) return data.reply;
+    throw new Error(data.error || "Unexpected response");
+  }
+  
+  async function smartAnalyze(text, type = 'translate') {
+    const tools = [
+      { name: "Gemini", model: "gemini" },
+      { name: "DeepSeek", model: "deepseek" },
+      { name: "Claude", model: "claude" }
+    ];
+    for (let tool of tools) {
+      try {
+        const result = await callWorker(tool.model, text, type);
+        if (result && result.length > 15) {
+          usageStats[tool.name.toLowerCase()]++;
+          updateToolStatus(tool.name);
+          return { result, tool: tool.name };
+        }
+      } catch(e) { console.log(`❌ ${tool.name} failed:`, e.message); }
+    }
+    throw new Error('فشلت جميع المحاولات');
+  }
+  
+  function updateToolStatus(tool) {
+    const statusDiv = document.getElementById('toolStatus');
+    const icons = { Gemini: 'fab fa-google', DeepSeek: 'fas fa-microchip', Claude: 'fab fa-cloudflare' };
+    statusDiv.innerHTML = `<i class="${icons[tool]}"></i> ${tool}`;
+  }
+  
+  async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    document.getElementById('processingStatus').classList.remove('hidden');
+    document.getElementById('progressContainer').classList.remove('hidden');
+    document.getElementById('analysisResults').classList.add('hidden');
+    document.getElementById('mediaPreview').innerHTML = '';
+    document.getElementById('mediaPreview').classList.add('hidden');
+    
+    const fileType = file.type;
+    let extractedText = "";
+    
+    try {
+      if (fileType.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById('mediaPreview').innerHTML = `<img src="${e.target.result}" class="media-preview">`;
+          document.getElementById('mediaPreview').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else if (fileType.startsWith('video/')) {
+        const url = URL.createObjectURL(file);
+        document.getElementById('mediaPreview').innerHTML = `<video src="${url}" controls class="media-preview"></video>`;
+        document.getElementById('mediaPreview').classList.remove('hidden');
+      }
+      
+      if (fileType === 'application/pdf') {
+        extractedText = await extractPDFText(file);
+      } else if (fileType.startsWith('image/')) {
+        showToast('🖼️ جاري استخراج النص من الصورة...', 'info');
+        extractedText = await extractImageText(file);
+      } else if (fileType.startsWith('video/')) {
+        extractedText = `[فيديو: ${file.name}]`;
+      } else {
+        extractedText = `[ملف: ${file.name}]`;
+      }
+      
+      currentContent = extractedText;
+      currentFileType = fileType;
+      
+      const shortContent = extractedText.length > 2500 ? extractedText.substring(0, 2500) : extractedText;
+      
+      showToast('🔄 جاري التحليل الذكي...', 'info');
+      const { result: analysis, tool } = await smartAnalyze(shortContent, 'translate');
+      document.getElementById('analysisContent').innerHTML = marked.parse(analysis);
+      document.getElementById('usedTool').innerHTML = `<span class="tool-badge tool-${tool.toLowerCase()}">${tool}</span> تم التحليل`;
+      
+      const { result: summary } = await smartAnalyze(`لخص هذا النص تلخيصاً علمياً موجزاً:\n${shortContent.substring(0, 1500)}`, 'summarize');
+      document.getElementById('zaitootaSummary').innerHTML = marked.parse(summary);
+      
+      const wordCount = extractedText.split(/\s+/).length;
+      document.getElementById('fileStats').innerHTML = `
+        <div class="grid grid-cols-2 gap-2 text-center">
+          <div><i class="fas fa-file"></i> ${file.name.substring(0, 30)}</div>
+          <div><i class="fas fa-font"></i> ${wordCount} كلمة</div>
+          <div><i class="fas fa-chart-line"></i> 🔥 ${tool}</div>
+        </div>
+      `;
+      
+      pdfFiles.unshift({ id: Date.now(), name: file.name, type: fileType, words: wordCount });
+      saveData(); renderPdfsList();
+      
+      document.getElementById('processingStatus').classList.add('hidden');
+      document.getElementById('progressContainer').classList.add('hidden');
+      document.getElementById('analysisResults').classList.remove('hidden');
+      showToast(`✅ تم التحليل باستخدام ${tool}!`, 'success');
+      
+    } catch(e) {
+      showToast(e.message || 'حدث خطأ', 'error');
+      document.getElementById('processingStatus').classList.add('hidden');
+      document.getElementById('progressContainer').classList.add('hidden');
+    }
+  }
+  
+  async function extractPDFText(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = "";
+    const maxPages = Math.min(pdf.numPages, 15);
+    for (let i = 1; i <= maxPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      fullText += content.items.map(item => item.str).join(' ') + "\n";
+      const percent = Math.round((i / maxPages) * 100);
+      document.getElementById('progressPercent').innerText = `${percent}%`;
+      document.getElementById('progressBar').style.width = `${percent}%`;
+      await new Promise(r => setTimeout(r, 10));
+    }
+    return fullText;
+  }
+  
+  async function extractImageText(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const { data: { text } } = await Tesseract.recognize(e.target.result, 'ara+eng', {
+            logger: m => {
+              if (m.status === 'recognizing text') {
+                const percent = Math.round(m.progress * 100);
+                document.getElementById('progressPercent').innerText = `${percent}%`;
+                document.getElementById('progressBar').style.width = `${percent}%`;
+              }
+            }
+          });
+          resolve(text || "لم يتم استخراج نص من الصورة");
+        } catch(err) { reject(err); }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+  
+  window.askQuickQuestion = async function(question) {
+    if (!currentContent) { showToast('الرجاء رفع ملف أولاً', 'error'); return; }
+    addToChat(question, 'user');
+    const loadingId = addToChat('<div class="loading-spinner"></div>', 'ai', true);
+    try {
+      const prompt = `السؤال: ${question}\n\nالمحتوى: ${currentContent.substring(0, 2000)}\n\nأجب بالعربية بشكل واضح ومختصر.`;
+      const { result, tool } = await smartAnalyze(prompt, 'chat');
+      document.getElementById(loadingId)?.remove();
+      addToChat(`<span class="tool-badge tool-${tool.toLowerCase()} text-xs">${tool}</span><br>${marked.parse(result)}`, 'ai');
+    } catch(e) {
+      document.getElementById(loadingId)?.remove();
+      addToChat(`❌ ${e.message}`, 'ai');
+    }
+  };
+  
+  window.askQuestion = async function() {
+    const input = document.getElementById('chatInput');
+    const question = input.value.trim();
+    if (!question) return;
+    if (!currentContent && pdfFiles.length === 0) { showToast('الرجاء رفع ملف أولاً', 'error'); return; }
+    addToChat(question, 'user');
+    input.value = '';
+    const loadingId = addToChat('<div class="loading-spinner"></div>', 'ai', true);
+    try {
+      const context = currentContent || (pdfFiles[0] ? "ملف سابق" : "لا يوجد محتوى");
+      const prompt = `السؤال: ${question}\n\nالمحتوى: ${context.substring(0, 2000)}\n\nأجب بالعربية بشكل واضح ومختصر.`;
+      const { result, tool } = await smartAnalyze(prompt, 'chat');
+      document.getElementById(loadingId)?.remove();
+      addToChat(`<span class="tool-badge tool-${tool.toLowerCase()} text-xs">${tool}</span><br>${marked.parse(result)}`, 'ai');
+    } catch(e) {
+      document.getElementById(loadingId)?.remove();
+      addToChat(`❌ ${e.message}`, 'ai');
+    }
+  };
+  
+  function addToChat(content, sender, returnId = false) {
+    const container = document.getElementById('chatHistory');
+    const id = 'msg_' + Date.now();
+    const msg = document.createElement('div');
+    msg.id = returnId ? id : undefined;
+    msg.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} mb-2`;
+    msg.innerHTML = `<div class="${sender === 'user' ? 'bg-blue-500 text-white' : 'bg-white'} p-2 rounded-2xl max-w-[85%] shadow-sm text-sm">${content}</div>`;
+    container.appendChild(msg);
+    container.scrollTop = container.scrollHeight;
+    return returnId ? id : null;
+  }
+  
+  window.generateResearch = async function() {
+    const title = document.getElementById('researchTitle')?.value;
+    const pages = document.getElementById('researchPages')?.value;
+    const refs = document.getElementById('researchReferences')?.value;
+    const topic = document.getElementById('researchTopic')?.value;
+    if (!title || !pages || !refs) { showToast('املأ الحقول', 'error'); return; }
+    showToast('جاري كتابة البحث...', 'info');
+    try {
+      const prompt = `اكتب بحثاً علمياً بالعربية بعنوان: ${title}. عدد الصفحات: ${pages} صفحة. عدد المراجع: ${refs}. الموضوع: ${topic || title}. اكتب مقدمة ومحتوى وخاتمة وقائمة مراجع.`;
+      const { result, tool } = await smartAnalyze(prompt, 'research');
+      document.getElementById('researchContent').innerHTML = marked.parse(result);
+      document.getElementById('researchResult').classList.remove('hidden');
+      showToast(`✅ تم باستخدام ${tool}`, 'success');
+    } catch(e) { showToast(e.message, 'error'); }
+  };
+  
+  window.downloadResearchPDF = function() {
+    const element = document.getElementById('researchContent');
+    if (!element || !element.innerHTML) { showToast('لا يوجد بحث', 'error'); return; }
+    html2pdf().set({ margin: 0.5, filename: 'البحث.pdf', image: { type: 'jpeg', quality: 0.98 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(element).save();
+  };
+  
+  function renderPdfsList() { document.getElementById('pdfsList').innerHTML = pdfFiles.slice(0,5).map(p=>`<div class="bg-gray-50 p-2 rounded-xl flex justify-between text-sm"><div><i class="fas fa-file"></i> ${escapeHtml(p.name).substring(0,25)}</div><button onclick="deletePDF('${p.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></div>`).join(''); }
+  window.deletePDF = (id) => { pdfFiles = pdfFiles.filter(p=>p.id!=id); saveData(); renderPdfsList(); };
+  window.addSubject = () => { let n=document.getElementById('subjectName')?.value.trim(); if(!n) return; subjects.push({id:Date.now(),name:n,color:document.getElementById('subjectColor')?.value||'#3b82f6'}); saveData(); renderSubjects(); updateSelects(); document.getElementById('subjectName').value=''; showToast('تم'); };
+  function renderSubjects() { document.getElementById('subjectsList').innerHTML = subjects.map(s=>`<div class="flex justify-between p-2 border-r-4 mb-1" style="border-right-color:${s.color}"><span>${escapeHtml(s.name)}</span><button onclick="deleteSubject('${s.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></div>`).join(''); document.getElementById('totalSubjects').innerText=subjects.length; }
+  window.addStudyPlan = () => { let s=document.getElementById('studySubjectSelect')?.value, d=document.getElementById('studyDaysGap')?.value, h=document.getElementById('studyHoursPerDay')?.value; if(!s||!d||!h) return; studyPlans.push({id:Date.now(),subject:s,daysGap:parseInt(d),hoursPerDay:parseFloat(h),sessionsCompleted:0}); saveData(); renderStudyPlans(); document.getElementById('studyDaysGap').value=''; document.getElementById('studyHoursPerDay').value=''; showToast('تم'); };
+  function renderStudyPlans() { const container = document.getElementById('studyPlansList'); if(!container) return; container.innerHTML = studyPlans.map(p=>`<div class="bg-blue-50 p-2 rounded-xl mb-2"><div class="flex justify-between"><b>${escapeHtml(p.subject)}</b><button onclick="recordSession(${p.id})" class="text-green-600 text-sm"><i class="fas fa-check"></i> سجل</button></div><div>⏰ ${p.hoursPerDay} س/اليوم | 📅 كل ${p.daysGap} يوم</div><div class="text-xs">✅ تم: ${p.sessionsCompleted} جلسة</div><div class="motivation-text text-xs">${getRandomMotivation()}</div></div>`).join(''); }
+  window.recordSession = (id) => { let p = studyPlans.find(p=>p.id===id); if(p){ p.sessionsCompleted++; sessions.push({id:Date.now(),subject:p.subject,date:new Date().toISOString().slice(0,10),hours:p.hoursPerDay}); saveData(); renderStudyPlans(); renderSessions(); updateChart(); showToast(`🎉 ${getRandomMotivation()}`); } };
+  function renderSessions() { let total=sessions.reduce((s,p)=>s+p.hours,0); document.getElementById('totalHours').innerText=total.toFixed(1); }
+  function updateChart() { if(!studyChart) return; let h={}; sessions.forEach(s=>h[s.subject]=(h[s.subject]||0)+s.hours); studyChart.data.labels=Object.keys(h); studyChart.data.datasets[0].data=Object.values(h); studyChart.update(); }
+  function updateSelects() { let sel=document.getElementById('studySubjectSelect'); if(sel) sel.innerHTML='<option value="">اختر المادة</option>'+subjects.map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join(''); }
+  function deleteSubject(id) { subjects=subjects.filter(s=>s.id!=id); saveData(); renderSubjects(); updateSelects(); }
+  function loadData() { if(!currentUser) return; subjects=JSON.parse(localStorage.getItem(`sub_${currentUser}`)||"[]"); pdfFiles=JSON.parse(localStorage.getItem(`pdf_${currentUser}`)||"[]"); sessions=JSON.parse(localStorage.getItem(`ses_${currentUser}`)||"[]"); studyPlans=JSON.parse(localStorage.getItem(`plans_${currentUser}`)||"[]"); renderSubjects(); renderPdfsList(); renderStudyPlans(); renderSessions(); updateSelects(); updateChart(); document.getElementById('totalSubjects').innerText=subjects.length; document.getElementById('totalPdfs').innerText=pdfFiles.length; }
+  function saveData() { if(!currentUser) return; localStorage.setItem(`sub_${currentUser}`,JSON.stringify(subjects)); localStorage.setItem(`pdf_${currentUser}`,JSON.stringify(pdfFiles)); localStorage.setItem(`ses_${currentUser}`,JSON.stringify(sessions)); localStorage.setItem(`plans_${currentUser}`,JSON.stringify(studyPlans)); }
+  window.exportAllData = () => { const data=JSON.stringify({subjects,pdfFiles,sessions,studyPlans}); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data])); a.download=`data.json`; a.click(); showToast('تم'); };
+  window.resetAllData = () => { if(confirm('حذف كل البيانات؟')) { subjects=[]; pdfFiles=[]; sessions=[]; studyPlans=[]; saveData(); loadData(); showToast('تم'); } };
+  function showToast(msg, type='success') { const t=document.createElement('div'); t.className='toast'; t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`; document.body.appendChild(t); setTimeout(()=>t.classList.add('show'),50); setTimeout(()=>{t.classList.remove('show'); setTimeout(()=>t.remove(),300);},2500); }
+  function copyText(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); showToast('تم النسخ'); }
+  
+  window.login = () => {
+    if (!selectedGender) { showToast('اختار جنسك', 'error'); return; }
+    let name = document.getElementById('loginName').value.trim();
+    if (!name) name = selectedGender === 'male' ? 'أبو الشدة' : 'الحبوبة';
+    currentUser = name;
+    const welcomeMsg = getWelcomeMessage(name, selectedGender);
+    document.getElementById('welcomeUser').innerHTML = welcomeMsg;
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    loadData();
+    showTab('pdfAssistant');
+    showToast(welcomeMsg, 'success');
+  };
+  
+  window.logout = () => {
+    currentUser = null;
+    selectedGender = null;
+    document.getElementById('genderMale').classList.remove('selected');
+    document.getElementById('genderFemale').classList.remove('selected');
+    document.getElementById('loginName').value = '';
+    document.getElementById('funnyMessage').innerHTML = `<i class="fas fa-smile-wink text-blue-500"></i> <span class="text-sm text-gray-700">اختار جنسك وادخل</span>`;
+    document.getElementById('authScreen').classList.remove('hidden');
+    document.getElementById('mainApp').classList.add('hidden');
+  };
+  
+  function showTab(tab) { document.querySelectorAll('.tab-content').forEach(el=>el.classList.add('hidden')); document.getElementById(tab+'Section')?.classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach((btn,i)=>{ btn.classList.remove('active'); const tabs=['pdfAssistant','research','subjects','study','stats']; if(tabs[i]===tab) btn.classList.add('active'); }); if(tab==='study') updateChart(); }
+  function escapeHtml(s) { if(!s) return ''; return String(s).replace(/[&<>]/g, m=>m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+  function initChart() { let ctx=document.getElementById('studyChart'); if(ctx) studyChart=new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'ساعات',data:[],backgroundColor:'#3b82f6'}]},options:{responsive:true}}); }
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js'; initChart(); window.showTab=showTab;
+</script>
+</body>
+</html>
