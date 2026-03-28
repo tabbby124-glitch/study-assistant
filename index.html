@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#3b82f6">
+  <title>تعال لم الفاتك | ترجمة PDF + صور + مذاكرة | م/ الطيب الرشيد</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://unpkg.com/tesseract.js@5.0.5/dist/tesseract.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <style>
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    body { font-family: 'Cairo', 'Tahoma', sans-serif; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); min-height: 100vh; padding-bottom: 80px; }
+    .card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 16px; transition: all 0.2s; }
+    .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 14px; border-radius: 16px; font-weight: 600; width: 100%; border: none; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-outline { border: 2px solid #3b82f6; color: #3b82f6; padding: 12px; border-radius: 14px; background: transparent; cursor: pointer; transition: 0.2s; }
+    .btn-outline:active { background: #eff6ff; }
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 14px; border-radius: 16px; font-weight: 600; width: 100%; border: none; cursor: pointer; }
+    .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 14px; border-radius: 16px; font-weight: 600; width: 100%; border: none; cursor: pointer; }
+    input, select, textarea { border: 2px solid #e5e7eb; border-radius: 14px; padding: 14px; width: 100%; margin-bottom: 12px; font-family: 'Cairo', sans-serif; transition: 0.2s; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; padding: 8px; color: #6b7280; background: none; border: none; cursor: pointer; border-radius: 40px; font-size: 12px; transition: 0.2s; }
+    .nav-item.active { color: #3b82f6; font-weight: 600; background: #eff6ff; }
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150%); background: #1f2937; color: white; padding: 12px 24px; border-radius: 40px; z-index: 1000; transition: transform 0.3s; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+    .result-box { background: #f8fafc; border-radius: 16px; padding: 16px; margin-top: 12px; border-right: 4px solid #3b82f6; transition: 0.2s; }
+    .tool-badge { display: inline-block; padding: 4px 10px; border-radius: 30px; font-size: 11px; margin-right: 8px; font-weight: bold; }
+    .upload-area { border: 2px dashed #cbd5e1; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; background: #fafafa; transition: 0.2s; }
+    .upload-area:hover { border-color: #3b82f6; background: #eff6ff; }
+    .quick-questions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .quick-question { background: #eff6ff; padding: 8px 16px; border-radius: 30px; font-size: 12px; cursor: pointer; color: #1e40af; transition: 0.2s; }
+    .quick-question:active { background: #3b82f6; color: white; transform: scale(0.96); }
+    .developer-name { display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #3b82f6, #2563eb); padding: 8px 20px; border-radius: 50px; color: white; font-weight: bold; font-size: 14px; }
+    .gender-option { transition: 0.2s; cursor: pointer; }
+    .gender-option.selected { border-color: #3b82f6 !important; background: #eff6ff; transform: scale(1.02); }
+    .funny-message-box { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-radius: 20px; padding: 12px; margin-top: 16px; text-align: center; border-right: 4px solid #3b82f6; }
+    .model-selector { background: #f3f4f6; border-radius: 16px; padding: 12px; margin-bottom: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .model-btn { padding: 8px 16px; border-radius: 40px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s; background: #e5e7eb; color: #374151; }
+    .model-btn.active { background: #3b82f6; color: white; box-shadow: 0 2px 8px rgba(59,130,246,0.4); }
+    .translation-options { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; justify-content: center; }
+    .trans-option { background: #e5e7eb; padding: 6px 12px; border-radius: 30px; font-size: 11px; cursor: pointer; transition: 0.2s; }
+    .trans-option.active { background: #3b82f6; color: white; }
+    .attempts-bar { background: #e0f2fe; border-radius: 30px; padding: 8px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .attempts-count { font-weight: bold; font-size: 20px; color: #2563eb; }
+    .subject-card { background: #f8fafc; border-radius: 16px; padding: 12px; margin-bottom: 12px; border-right: 4px solid; transition: 0.2s; cursor: pointer; }
+    .subject-card:hover { transform: translateX(-4px); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .study-plan-card { background: #fef3c7; border-radius: 12px; padding: 10px; margin-top: 8px; }
+    @media (max-width: 480px) { .card { padding: 16px; } .nav-item span { font-size: 10px; } .model-btn { padding: 6px 12px; font-size: 11px; } }
+  </style>
+</head>
+<body class="p-3">
+
+<div id="authScreen" class="min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+    <div class="text-center mb-6">
+      <div class="inline-block p-3 bg-gradient-to-r from-blue-500 to-blue-700 rounded-2xl mb-3"><i class="fas fa-brain text-4xl text-white"></i></div>
+      <h2 class="text-2xl font-bold text-blue-600">🤖 تعال لم الفاتك</h2>
+      <p class="text-gray-500">ترجمة PDF + صور + مذاكرة ذكية</p>
+      <div class="mt-3"><div class="developer-name" style="display: inline-flex;"><i class="fas fa-code"></i><span>م/ الطيب الرشيد</span><i class="fas fa-crown"></i></div></div>
+    </div>
+    <input type="text" id="loginName" placeholder="شنو اسمك؟" class="p-3 text-center" onkeypress="if(event.key==='Enter') login()">
+    <div class="mb-4"><div class="flex gap-3"><div onclick="selectGender('male')" id="genderMale" class="gender-option flex-1 text-center p-3 rounded-xl border-2"><i class="fas fa-mars text-2xl text-blue-500"></i><p>ولد</p></div><div onclick="selectGender('female')" id="genderFemale" class="gender-option flex-1 text-center p-3 rounded-xl border-2"><i class="fas fa-venus text-2xl text-pink-500"></i><p>بنت</p></div></div></div>
+    <button onclick="login()" class="btn-primary"><i class="fas fa-sign-in-alt"></i> خش ي مهمل</button>
+    <div id="funnyMessage" class="funny-message-box mt-4"><i class="fas fa-smile-wink text-blue-500"></i><span>اختار جنسك وادخل</span></div>
+  </div>
+</div>
+
+<div id="mainApp" class="hidden max-w-lg mx-auto">
+  <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-5 rounded-3xl shadow-xl mb-4">
+    <div class="flex justify-between items-center flex-wrap gap-2">
+      <div><h1 class="text-xl font-bold">🤖 تعال لم الفاتك</h1><p class="text-white/80 text-xs" id="welcomeUser"></p></div>
+      <div class="flex items-center gap-2"><div class="bg-white/20 px-2 py-1 rounded-full text-xs"><i class="fas fa-user-check"></i> م/ الطيب الرشيد</div><div id="toolStatus" class="bg-white/20 px-2 py-1 rounded-full text-xs"><i class="fas fa-microchip"></i> جاهز</div><button onclick="logout()" class="bg-red-500/30 px-3 py-1.5 rounded-full text-sm hover:bg-red-500/50 transition"><i class="fas fa-sign-out-alt"></i> خروج</button></div>
+    </div>
+  </header>
+
+  <div id="attemptsBar" class="attempts-bar hidden">
+    <div><i class="fas fa-hourglass-half text-orange-500"></i> محاولات الترجمة المتبقية اليوم</div>
+    <div class="attempts-count" id="attemptsCount">5</div>
+  </div>
+
+  <section id="pdfAssistantSection" class="tab-content">
+    <div class="card">
+      <h2 class="font-bold mb-3 text-center text-xl text-blue-600">📎 ترجمة الملفات والصور</h2>
+      <p class="text-center text-gray-600 text-sm mb-2">ارفع PDF أو صورة وسيتم ترجمتها فوراً (تستهلك محاولة)</p>
+      
+      <div class="model-selector">
+        <div class="model-btn model-cerebras" data-model="cerebras" onclick="selectModel('cerebras')">⚡ Cerebras</div>
+        <div class="model-btn model-groq" data-model="groq" onclick="selectModel('groq')">🚀 Groq</div>
+        <div class="model-btn model-deepseek" data-model="deepseek" onclick="selectModel('deepseek')">🤖 DeepSeek</div>
+        <div class="model-btn model-gemini" data-model="gemini" onclick="selectModel('gemini')">🌟 Gemini</div>
+        <div class="model-btn model-openrouter" data-model="openrouter" onclick="selectModel('openrouter')">🌐 OpenRouter</div>
+      </div>
+      
+      <div class="translation-options">
+        <div class="trans-option active" data-trans="normal" onclick="selectTranslationType('normal')">📖 ترجمة عادية</div>
+        <div class="trans-option" data-trans="sudanese" onclick="selectTranslationType('sudanese')">🎭 لهجة سودانية</div>
+        <div class="trans-option" data-trans="academic" onclick="selectTranslationType('academic')">📚 ترجمة أكاديمية</div>
+        <div class="trans-option" data-trans="terms" onclick="selectTranslationType('terms')">🔍 مع المصطلحات</div>
+      </div>
+      
+      <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <i class="fas fa-cloud-upload-alt text-3xl text-blue-500 mb-2"></i>
+        <p class="text-sm">📄 اضغط لرفع PDF أو صورة للترجمة</p>
+        <p class="text-xs text-gray-400 mt-1">يدعم: PDF، JPG، PNG (يتم استخراج النص تلقائياً)</p>
+        <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="handleFileUpload(event)">
+      </div>
+      
+      <div class="mt-3 flex gap-2">
+        <button onclick="captureFromCamera()" class="btn-outline flex-1"><i class="fas fa-camera"></i> تصوير</button>
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleCameraUpload(event)">
+      </div>
+      
+      <div class="quick-questions">
+        <div class="quick-question" onclick="askQuick('لخص المحتوى بشكل مختصر')">📝 لخص</div>
+        <div class="quick-question" onclick="askQuick('ما هي النقاط الرئيسية؟')">⭐ نقاط رئيسية</div>
+        <div class="quick-question" onclick="askQuick('اشرح المصطلحات الصعبة')">📖 شرح</div>
+        <div class="quick-question" onclick="askQuick('اكتب أسئلة اختبار مع الإجابات')">📝 اختبار</div>
+      </div>
+      
+      <div id="progressContainer" class="hidden mb-3"><div class="flex justify-between text-sm mb-1"><span>جاري...</span><span id="progressPercent">0%</span></div><div class="w-full bg-gray-200 rounded-full h-2"><div id="progressBar" class="bg-blue-500 h-2 rounded-full" style="width: 0%"></div></div></div>
+      <div id="processingStatus" class="hidden text-center py-2"><div class="loading-spinner"></div><p class="text-sm mt-2">جاري استخراج النص والترجمة...</p></div>
+      
+      <div id="analysisResults" class="hidden">
+        <div class="result-box mb-3 bg-gray-100"><h3 class="font-bold"><i class="fas fa-robot"></i> الخدمة المستخدمة</h3><p id="usedTool" class="text-sm"></p></div>
+        <div class="result-box mb-3 bg-green-50"><div class="flex justify-between"><h3 class="font-bold text-green-700">🌍 الترجمة إلى العربية</h3><button onclick="copyText('analysisContent')" class="text-xs bg-gray-200 px-2 py-1 rounded">نسخ</button></div><div id="analysisContent" class="text-sm leading-relaxed max-h-96 overflow-y-auto mt-2"></div></div>
+        <div class="result-box mb-3 bg-blue-50"><h3 class="font-bold text-blue-700">✨ الزيتوته (تلخيص علمي)</h3><div id="zaitootaSummary" class="text-sm"></div></div>
+        <div class="result-box mb-3 bg-amber-50"><h3 class="font-bold text-amber-700">📖 المصطلحات المهمة</h3><div id="termsList" class="text-sm"></div></div>
+        <div class="result-box bg-gray-50"><h3 class="font-bold mb-2">📊 معلومات الملف</h3><div id="fileStats" class="text-sm"></div></div>
+      </div>
+      
+      <div class="mt-4">
+        <h3 class="font-bold mb-2 text-blue-600"><i class="fas fa-comments"></i> اسأل عن المحتوى المترجم</h3>
+        <div id="chatHistory" class="h-48 overflow-y-auto mb-3 space-y-2 p-2 bg-gray-50 rounded-xl"><div class="bg-white p-2 rounded-lg text-sm">👋 مرحباً! ارفع ملفاً وسيتم ترجمته فوراً</div></div>
+        <div class="flex gap-2"><input type="text" id="chatInput" placeholder="اسأل عن المحتوى المترجم..." class="flex-1 p-3 rounded-xl border-2 text-sm" onkeypress="if(event.key==='Enter') askQuestion()"><button onclick="askQuestion()" class="btn-primary px-4 py-3 w-auto"><i class="fas fa-paper-plane"></i></button></div>
+      </div>
+    </div>
+    <div class="card"><h3 class="font-bold mb-2">📚 الملفات المترجمة سابقاً</h3><div id="pdfsList" class="space-y-2"></div></div>
+  </section>
+
+  <section id="studySection" class="tab-content hidden">
+    <div class="card">
+      <h2 class="font-bold text-blue-600 mb-3">📚 المواد + المذاكرة</h2>
+      <p class="text-gray-600 text-sm mb-3">أضف المواد التي تذاكرها وخطط لمذاكرتها</p>
+      
+      <div class="bg-gray-50 p-3 rounded-xl mb-4">
+        <h3 class="font-bold mb-2">➕ إضافة مادة جديدة</h3>
+        <div class="flex gap-2 items-end">
+          <input type="text" id="subjectName" placeholder="اسم المادة" class="p-2 text-sm flex-1">
+          <input type="color" id="subjectColor" value="#3b82f6" class="w-12 h-10 rounded-lg">
+          <button onclick="addSubject()" class="btn-primary py-2 px-4 text-sm w-auto"><i class="fas fa-plus"></i> إضافة</button>
+        </div>
+      </div>
+      
+      <div id="subjectsWithPlans" class="space-y-3"></div>
+      
+      <div class="mt-4 p-3 bg-blue-50 rounded-xl">
+        <div class="flex justify-between text-sm flex-wrap gap-2">
+          <span><i class="fas fa-book"></i> إجمالي المواد: <span id="totalSubjects">0</span></span>
+          <span><i class="fas fa-check-circle"></i> جلسات اليوم: <span id="todaySessions">0</span></span>
+          <span><i class="fas fa-chart-line"></i> إجمالي الساعات: <span id="totalHours">0</span></span>
+        </div>
+      </div>
+      
+      <canvas id="studyChart" height="120" class="mt-3"></canvas>
+    </div>
+  </section>
+
+  <section id="researchSection" class="tab-content hidden">
+    <div class="card">
+      <div class="bg-green-50 p-2 rounded-xl mb-3 text-center">
+        <i class="fas fa-infinity text-green-600"></i> البحث غير محدود - لا يستهلك محاولات!
+      </div>
+      <h2 class="font-bold text-blue-600">📝 اكتب لي البحث (بصورة كاملة)</h2>
+      
+      <div class="bg-yellow-50 p-3 rounded-xl mb-3 text-sm text-yellow-800">
+        <i class="fas fa-info-circle"></i> إذا كان البحث أكثر من 5 صفحات، سيتم تقسيمه تلقائياً لجزئين للحصول على محتوى كامل. يمكنك طلب تكملة بعد الانتهاء.
+      </div>
+      
+      <form onsubmit="event.preventDefault(); generateResearch();">
+        <input type="text" id="researchTitle" placeholder="عنوان البحث" required>
+        <textarea id="researchDescription" placeholder="وصف تفصيلي للبحث (المحتوى المطلوب)" rows="4" required></textarea>
+        <div class="flex gap-2">
+          <input type="number" id="researchPages" placeholder="عدد الصفحات" required class="flex-1" min="1" max="20">
+          <input type="number" id="researchReferences" placeholder="عدد المراجع" required class="flex-1" min="1" max="30">
+        </div>
+        <button type="submit" class="btn-success"><i class="fas fa-magic"></i> أنشئ البحث الكامل</button>
+      </form>
+      
+      <div id="researchProgress" class="hidden mt-3 text-center">
+        <div class="loading-spinner"></div>
+        <p class="text-sm mt-1">جاري كتابة البحث... قد يستغرق دقيقة</p>
+      </div>
+      
+      <div id="researchResult" class="hidden mt-3">
+        <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
+          <h3 class="font-bold text-blue-600">📄 نتيجة البحث</h3>
+          <div class="flex gap-2">
+            <button onclick="copyText('researchContent')" class="text-sm bg-gray-200 px-3 py-1 rounded-full"><i class="fas fa-copy"></i> نسخ</button>
+            <button onclick="downloadResearchPDF()" class="text-sm bg-blue-500 text-white px-3 py-1 rounded-full"><i class="fas fa-download"></i> PDF</button>
+          </div>
+        </div>
+        <div id="researchContent" class="result-box max-h-[500px] overflow-y-auto"></div>
+        <div class="flex gap-2 mt-3">
+          <button onclick="continueResearch()" class="btn-outline text-sm flex-1"><i class="fas fa-plus-circle"></i> طلب تكملة البحث</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="statsSection" class="tab-content hidden">
+    <div class="card">
+      <h2 class="font-bold">📊 إحصائياتي</h2>
+      <div id="statsContent"></div>
+      <div class="flex gap-2 mt-3">
+        <button onclick="exportAllData()" class="btn-outline flex-1"><i class="fas fa-download"></i> تصدير</button>
+        <button onclick="resetAllData()" class="btn-outline flex-1 text-red-500 border-red-500"><i class="fas fa-trash"></i> حذف الكل</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav class="bottom-nav">
+  <button onclick="showTab('pdfAssistant')" class="nav-item active"><i class="fas fa-file-alt"></i><span>ترجمة</span></button>
+  <button onclick="showTab('study')" class="nav-item"><i class="fas fa-book-open"></i><span>مواد</span></button>
+  <button onclick="showTab('research')" class="nav-item"><i class="fas fa-pen-fancy"></i><span>بحث</span></button>
+  <button onclick="showTab('stats')" class="nav-item"><i class="fas fa-chart-line"></i><span>إحصائيات</span></button>
+</nav>
+
+<script>
+  const WORKER_URL = "https://myapp.tabbby124.workers.dev/";
+  
+  let currentModel = "cerebras";
+  let translationType = "normal";
+  let currentUser = null, selectedGender = null;
+  let subjects = [], pdfFiles = [], sessions = [], studyPlans = [];
+  let studyChart = null;
+  let currentContent = "";
+  let attemptsData = { date: "", count: 5 };
+  let lastResearchTitle = "", lastResearchDesc = "";
+
+  function updateAttemptsDisplay() {
+    const today = new Date().toISOString().slice(0,10);
+    if (attemptsData.date !== today) {
+      attemptsData = { date: today, count: 5 };
+      saveAttempts();
+    }
+    document.getElementById('attemptsCount').innerText = attemptsData.count;
+    const bar = document.getElementById('attemptsBar');
+    if (attemptsData.count <= 0) {
+      bar.style.background = "#fee2e2";
+    } else {
+      bar.style.background = "#e0f2fe";
+    }
+    bar.classList.remove('hidden');
+  }
+  
+  function useAttempt() {
+    if (attemptsData.count <= 0) {
+      showToast("⚠️ انتهت محاولات الترجمة اليوم! عاود غداً", "error");
+      return false;
+    }
+    attemptsData.count--;
+    saveAttempts();
+    updateAttemptsDisplay();
+    return true;
+  }
+  
+  async function callModelInternal(prompt, consumeAttempt = true) {
+    if (consumeAttempt && !useAttempt()) throw new Error("لا يوجد محاولات متبقية اليوم");
+    
+    const maxLength = 3500;
+    const shortenedPrompt = prompt.length > maxLength ? prompt.substring(0, maxLength) : prompt;
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: shortenedPrompt, service: currentModel })
+    });
+    if (!response.ok) throw new Error(`Worker error: ${response.status}`);
+    const data = await response.json();
+    if (data.success && data.response) return data.response;
+    throw new Error(data.error || "لا يوجد رد من الخادم");
+  }
+  
+  async function callModel(prompt) {
+    return callModelInternal(prompt, true);
+  }
+  
+  async function callModelForResearch(prompt) {
+    return callModelInternal(prompt, false);
+  }
+  
+  async function translateWithModel(text) {
+    let translationPrompt = "";
+    if (translationType === "normal") {
+      translationPrompt = `قم بترجمة النص التالي إلى العربية ترجمة احترافية مفهومة:\n\n${text.substring(0, 3000)}`;
+    } else if (translationType === "sudanese") {
+      translationPrompt = `قم بترجمة النص التالي إلى اللهجة السودانية العامية (دارجة سودانية):\n\n${text.substring(0, 2800)}`;
+    } else if (translationType === "academic") {
+      translationPrompt = `قم بترجمة النص التالي ترجمة أكاديمية علمية دقيقة:\n\n${text.substring(0, 3000)}`;
+    } else if (translationType === "terms") {
+      translationPrompt = `قم بترجمة النص التالي إلى العربية مع استخراج المصطلحات المهمة وشرحها:\n\n${text.substring(0, 2800)}`;
+    }
+    const result = await callModel(translationPrompt);
+    if (result && result.length > 5) {
+      return { result, model: currentModel };
+    }
+    throw new Error('فشل الترجمة');
+  }
+  
+  async function analyzeWithModel(text) {
+    const result = await callModel(text);
+    if (result && result.length > 5) return { result, model: currentModel };
+    throw new Error('فشل التحليل');
+  }
+  
+  function updateToolStatus(model) {
+    const statusDiv = document.getElementById('toolStatus');
+    const names = { cerebras: 'Cerebras', groq: 'Groq', deepseek: 'DeepSeek', gemini: 'Gemini', openrouter: 'OpenRouter' };
+    statusDiv.innerHTML = `<i class="fas fa-microchip"></i> ${names[model] || model.toUpperCase()}`;
+  }
+  
+  function selectModel(model) {
+    currentModel = model;
+    document.querySelectorAll('.model-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.model-${model}`).classList.add('active');
+    showToast(`✅ تم اختيار ${model.toUpperCase()}`, 'success');
+  }
+  
+  function selectTranslationType(type) {
+    translationType = type;
+    document.querySelectorAll('.trans-option').forEach(opt => opt.classList.remove('active'));
+    document.querySelector(`.trans-option[data-trans="${type}"]`).classList.add('active');
+    const names = { normal: 'ترجمة عادية', sudanese: 'لهجة سودانية', academic: 'أكاديمية', terms: 'مع المصطلحات' };
+    showToast(`✅ ${names[type]}`, 'success');
+  }
+  
+  async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (attemptsData.count <= 0) { showToast("⚠️ انتهت محاولات الترجمة اليوم!", "error"); return; }
+    document.getElementById('processingStatus').classList.remove('hidden');
+    document.getElementById('progressContainer').classList.remove('hidden');
+    document.getElementById('analysisResults').classList.add('hidden');
+    
+    let extractedText = "";
+    try {
+      if (file.type === 'application/pdf') {
+        extractedText = await extractPDFText(file);
+      } else if (file.type.startsWith('image/')) {
+        extractedText = await extractImageText(file);
+      }
+      if (!extractedText || extractedText.trim().length < 10) throw new Error("لم يتم استخراج نص كافٍ من الملف");
+      
+      currentContent = extractedText;
+      
+      showToast(`🔄 جاري الترجمة باستخدام ${currentModel.toUpperCase()}...`, 'info');
+      const { result: translation, model: usedModel } = await translateWithModel(extractedText);
+      document.getElementById('analysisContent').innerHTML = marked.parse(translation);
+      document.getElementById('usedTool').innerHTML = `<span class="tool-badge" style="background:#3b82f6; color:white">${usedModel.toUpperCase()}</span> تمت الترجمة بنجاح`;
+      
+      const { result: summary } = await analyzeWithModel(`لخص هذا النص تلخيصاً علمياً موجزاً بالعربية:\n${extractedText.substring(0, 1800)}`);
+      document.getElementById('zaitootaSummary').innerHTML = marked.parse(summary);
+      
+      const { result: terms } = await analyzeWithModel(`استخرج أهم 10 مصطلحات من النص واشرحها شرحاً موجزاً:\n${extractedText.substring(0, 1800)}`);
+      document.getElementById('termsList').innerHTML = marked.parse(terms);
+      
+      const wordCount = extractedText.split(/\s+/).length;
+      const transTypeNames = { normal: 'عادية', sudanese: 'لهجة سودانية', academic: 'أكاديمية', terms: 'مع المصطلحات' };
+      document.getElementById('fileStats').innerHTML = `<div class="grid grid-cols-2 gap-2 text-center"><div>📄 ${file.name.substring(0, 30)}</div><div>📊 ${wordCount} كلمة</div><div>🎯 ${transTypeNames[translationType]}</div><div>🤖 ${usedModel.toUpperCase()}</div></div>`;
+      
+      pdfFiles.unshift({ id: Date.now(), name: file.name, words: wordCount, translated: true, date: new Date().toLocaleString() });
+      saveData(); renderPdfsList();
+      
+      document.getElementById('processingStatus').classList.add('hidden');
+      document.getElementById('progressContainer').classList.add('hidden');
+      document.getElementById('analysisResults').classList.remove('hidden');
+      showToast(`✅ تمت الترجمة بنجاح`, 'success');
+    } catch(e) { showToast(e.message, 'error'); document.getElementById('processingStatus').classList.add('hidden'); document.getElementById('progressContainer').classList.add('hidden'); }
+  }
+  
+  async function extractPDFText(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = "";
+    const maxPages = Math.min(pdf.numPages, 20);
+    for (let i = 1; i <= maxPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      fullText += content.items.map(item => item.str).join(' ') + "\n";
+      document.getElementById('progressPercent').innerText = `${Math.round(i/maxPages*100)}%`;
+      document.getElementById('progressBar').style.width = `${Math.round(i/maxPages*100)}%`;
+      await new Promise(r => setTimeout(r, 5));
+    }
+    return fullText;
+  }
+  
+  async function extractImageText(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const { data: { text } } = await Tesseract.recognize(e.target.result, 'ara+eng', {
+            logger: m => { if (m.status === 'recognizing text') { const p = Math.round(m.progress * 100); document.getElementById('progressPercent').innerText = `${p}%`; document.getElementById('progressBar').style.width = `${p}%`; } }
+          });
+          resolve(text || "لم يتم استخراج نص من الصورة");
+        } catch(err) { reject(err); }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+  
+  function captureFromCamera() {
+    document.getElementById('cameraInput').click();
+  }
+  
+  async function handleCameraUpload(event) {
+    const file = event.target.files[0];
+    if (file) await handleFileUpload({ target: { files: [file] } });
+  }
+  
+  function addSubject() {
+    let name = document.getElementById('subjectName')?.value.trim();
+    if (!name) { showToast('أدخل اسم المادة', 'error'); return; }
+    const color = document.getElementById('subjectColor')?.value || '#3b82f6';
+    if (subjects.some(s => s.name === name)) { showToast('المادة موجودة بالفعل', 'error'); return; }
+    subjects.push({ id: Date.now(), name, color });
+    saveData();
+    renderSubjectsWithPlans();
+    updateChart();
+    showToast('✅ تم إضافة المادة');
+    document.getElementById('subjectName').value = '';
+  }
+  
+  function addStudyPlan(subjectId) {
+    const daysGap = prompt('كل كم يوم تذاكر هذه المادة؟ (أدخل عدد الأيام)');
+    if (!daysGap || isNaN(daysGap)) return;
+    const hoursPerDay = prompt('كم ساعة تذاكر في اليوم؟');
+    if (!hoursPerDay || isNaN(hoursPerDay)) return;
+    const subject = subjects.find(s => s.id === subjectId);
+    if (subject) {
+      studyPlans.push({ id: Date.now(), subjectId, subjectName: subject.name, daysGap: parseInt(daysGap), hoursPerDay: parseFloat(hoursPerDay), sessionsCompleted: 0 });
+      saveData();
+      renderSubjectsWithPlans();
+      showToast('✅ تم إضافة خطة المذاكرة');
+    }
+  }
+  
+  function recordSession(planId) {
+    const plan = studyPlans.find(p => p.id === planId);
+    if (plan) {
+      plan.sessionsCompleted++;
+      sessions.push({ id: Date.now(), subject: plan.subjectName, date: new Date().toISOString().slice(0,10), hours: plan.hoursPerDay });
+      saveData();
+      renderSubjectsWithPlans();
+      updateChart();
+      showToast(`🎉 تم تسجيل جلسة ${plan.subjectName}`);
+    }
+  }
+  
+  function deleteSubject(id) {
+    if (confirm('هل تريد حذف هذه المادة وجميع خططها؟')) {
+      subjects = subjects.filter(s => s.id !== id);
+      studyPlans = studyPlans.filter(p => p.subjectId !== id);
+      saveData();
+      renderSubjectsWithPlans();
+      updateChart();
+      showToast('تم حذف المادة');
+    }
+  }
+  
+  function deleteStudyPlan(planId) {
+    studyPlans = studyPlans.filter(p => p.id !== planId);
+    saveData();
+    renderSubjectsWithPlans();
+    showToast('تم حذف الخطة');
+  }
+  
+  function renderSubjectsWithPlans() {
+    const container = document.getElementById('subjectsWithPlans');
+    if (!container) return;
+    if (subjects.length === 0) {
+      container.innerHTML = '<div class="text-center text-gray-500 p-4">📚 لا توجد مواد بعد، أضف مادة جديدة</div>';
+      return;
+    }
+    container.innerHTML = subjects.map(subject => {
+      const subjectPlans = studyPlans.filter(p => p.subjectId === subject.id);
+      return `
+        <div class="subject-card" style="border-right-color: ${subject.color}">
+          <div class="flex justify-between items-center">
+            <div class="font-bold"><span style="color: ${subject.color}">●</span> ${escapeHtml(subject.name)}</div>
+            <div>
+              <button onclick="addStudyPlan(${subject.id})" class="text-green-600 text-sm mx-1"><i class="fas fa-plus-circle"></i> خطة</button>
+              <button onclick="deleteSubject(${subject.id})" class="text-red-500 text-sm"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          ${subjectPlans.length === 0 ? '<div class="text-gray-400 text-xs mt-2">لا توجد خطة مذاكرة، أضف خطة</div>' : subjectPlans.map(plan => `
+            <div class="study-plan-card">
+              <div class="flex justify-between items-center flex-wrap gap-2">
+                <div><i class="fas fa-calendar-alt text-amber-600"></i> كل ${plan.daysGap} يوم | ⏰ ${plan.hoursPerDay} س/يوم</div>
+                <div><button onclick="recordSession(${plan.id})" class="bg-green-500 text-white px-3 py-1 rounded-full text-xs"><i class="fas fa-check"></i> سجل جلسة</button>
+                <button onclick="deleteStudyPlan(${plan.id})" class="text-red-500 text-xs mx-1"><i class="fas fa-trash"></i></button></div>
+              </div>
+              <div class="text-sm mt-1">✅ جلسات مكتملة: ${plan.sessionsCompleted}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }).join('');
+    document.getElementById('totalSubjects').innerText = subjects.length;
+    renderSessions();
+  }
+  
+  function renderPdfsList() {
+    const container = document.getElementById('pdfsList');
+    if (container) {
+      if (pdfFiles.length === 0) {
+        container.innerHTML = '<div class="text-gray-400 text-center p-2">لا يوجد ملفات مترجمة بعد</div>';
+      } else {
+        container.innerHTML = pdfFiles.slice(0,8).map(p => `<div class="bg-gray-50 p-2 rounded-xl flex justify-between items-center text-sm"><div><i class="fas fa-file-pdf text-red-500"></i> ${escapeHtml(p.name).substring(0,30)}${p.translated ? ' ✓' : ''}</div><button onclick="deletePDF('${p.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></div>`).join('');
+      }
+    }
+  }
+  
+  window.deletePDF = (id) => { pdfFiles = pdfFiles.filter(p => p.id != id); saveData(); renderPdfsList(); };
+  
+  function renderSessions() {
+    let total = sessions.reduce((s,p) => s + p.hours, 0);
+    document.getElementById('totalHours').innerText = total.toFixed(1);
+    const today = new Date().toISOString().slice(0,10);
+    const todaySessions = sessions.filter(s => s.date === today).length;
+    document.getElementById('todaySessions').innerText = todaySessions;
+    
+    const statsContainer = document.getElementById('statsContent');
+    if (statsContainer) {
+      const subjectsStats = {};
+      sessions.forEach(s => { subjectsStats[s.subject] = (subjectsStats[s.subject] || 0) + s.hours; });
+      statsContainer.innerHTML = `
+        <div class="space-y-2">
+          <div class="flex justify-between"><span>📚 إجمالي المواد:</span><span class="font-bold">${subjects.length}</span></div>
+          <div class="flex justify-between"><span>⏱️ إجمالي ساعات المذاكرة:</span><span class="font-bold">${total.toFixed(1)} ساعة</span></div>
+          <div class="flex justify-between"><span>✅ عدد الجلسات:</span><span class="font-bold">${sessions.length}</span></div>
+          <div class="flex justify-between"><span>📄 ملفات مترجمة:</span><span class="font-bold">${pdfFiles.length}</span></div>
+          <div class="mt-2 pt-2 border-t"><span>📊 تفصيل الساعات:</span></div>
+          ${Object.entries(subjectsStats).map(([s,h]) => `<div class="flex justify-between text-sm"><span>${s}:</span><span>${h.toFixed(1)} ساعة</span></div>`).join('')}
+        </div>
+      `;
+    }
+  }
+  
+  function updateChart() {
+    if (!studyChart) return;
+    let hours = {};
+    sessions.forEach(s => hours[s.subject] = (hours[s.subject] || 0) + s.hours);
+    const labels = Object.keys(hours);
+    const data = Object.values(hours);
+    studyChart.data.labels = labels;
+    studyChart.data.datasets[0].data = data;
+    studyChart.update();
+  }
+  
+  async function generateResearch() {
+    const title = document.getElementById('researchTitle')?.value;
+    const description = document.getElementById('researchDescription')?.value;
+    const pages = parseInt(document.getElementById('researchPages')?.value);
+    const refs = document.getElementById('researchReferences')?.value;
+    
+    if (!title || !description || !pages || !refs) { 
+      showToast('املأ جميع الحقول', 'error'); 
+      return; 
+    }
+    
+    lastResearchTitle = title;
+    lastResearchDesc = description;
+    
+    document.getElementById('researchProgress').classList.remove('hidden');
+    document.getElementById('researchResult').classList.add('hidden');
+    
+    showToast(`📝 جاري كتابة البحث (${pages} صفحة)... قد يستغرق دقيقة`, 'info');
+    
+    try {
+      let fullResearch = "";
+      
+      if (pages > 5) {
+        const promptPart1 = `اكتب الجزء الأول من بحث علمي كامل ومفصل جداً بالعربية.
+العنوان: "${title}"
+الموضوع: ${description}
+المطلوب: مقدمة تفصيلية جداً + المحتوى الأساسي (حوالي 50% من المحتوى).
+اكتب بأسلوب أكاديمي غني، لا تختصر أي شيء، استخدم لغة فصيحة.`;
+
+        const result1 = await callModelForResearch(promptPart1);
+        fullResearch = `<div class="mb-4"><h3 class="font-bold text-blue-600 mb-2">📖 الجزء الأول: المقدمة والمحتوى الأساسي</h3>${marked.parse(result1)}</div>`;
+        
+        const promptPart2 = `اكمل البحث العلمي بعنوان: "${title}".
+الموضوع: ${description}
+المطلوب: استكمال المحتوى المتبقي + خاتمة مفصلة + قائمة مراجع علمية (${refs} مرجع).
+اكتب بتفصيل كامل جداً، لا تختصر.`;
+
+        const result2 = await callModelForResearch(promptPart2);
+        fullResearch += `<div class="mt-4"><h3 class="font-bold text-green-600 mb-2">📖 الجزء الثاني: الخاتمة والمراجع</h3>${marked.parse(result2)}</div>`;
+        
+      } else {
+        const prompt = `اكتب بحثاً علمياً كاملاً ومفصلاً جداً بالعربية.
+العنوان: "${title}"
+الموضوع: ${description}
+عدد الصفحات المطلوبة: ${pages} صفحة
+عدد المراجع: ${refs}
+
+❗ مهم جداً: اكتب بتفصيل شديد جداً، لا تختصر أي شيء. استخدم لغة أكاديمية فصيحة.
+يجب أن يحتوي البحث على: مقدمة مفصلة، محتوى مقسم إلى أقسام، خاتمة شاملة، قائمة مراجع.`;
+
+        const result = await callModelForResearch(prompt);
+        fullResearch = marked.parse(result);
+      }
+      
+      document.getElementById('researchContent').innerHTML = fullResearch;
+      document.getElementById('researchResult').classList.remove('hidden');
+      document.getElementById('researchProgress').classList.add('hidden');
+      
+      const textLength = fullResearch.replace(/<[^>]*>/g, '').length;
+      showToast(`✅ تم كتابة البحث (حوالي ${Math.round(textLength/500)} صفحة)`, 'success');
+      
+    } catch(e) { 
+      document.getElementById('researchProgress').classList.add('hidden');
+      showToast('❌ فشل: ' + e.message, 'error'); 
+    }
+  }
+  
+  async function continueResearch() {
+    if (!lastResearchTitle) {
+      showToast('لا يوجد بحث سابق للتكملة', 'error');
+      return;
+    }
+    
+    showToast('📝 جاري كتابة تكملة البحث...', 'info');
+    
+    try {
+      const prompt = `تابع البحث السابق بعنوان: "${lastResearchTitle}"
+الموضوع: ${lastResearchDesc}
+
+المطلوب: أكمل كتابة محتوى إضافي للبحث، أضف أقساماً جديدة، تفاصيل أكثر، أو وسع النقاط الموجودة.
+اكتب بتفصيل كامل وبأسلوب أكاديمي.`;
+
+      const result = await callModelForResearch(prompt);
+      
+      const currentContentDiv = document.getElementById('researchContent');
+      const newContent = currentContentDiv.innerHTML + `<div class="mt-4 pt-4 border-t-2 border-blue-200"><h3 class="font-bold text-green-600 mb-2">📖 تكملة البحث</h3>${marked.parse(result)}</div>`;
+      currentContentDiv.innerHTML = newContent;
+      
+      showToast('✅ تمت إضافة تكملة البحث', 'success');
+    } catch(e) {
+      showToast('فشل في كتابة التكملة: ' + e.message, 'error');
+    }
+  }
+  
+  window.askQuick = async function(q) {
+    if (!currentContent) { showToast('ارفع ملفاً أولاً', 'error'); return; }
+    if (attemptsData.count <= 0) { showToast("⚠️ انتهت محاولات الترجمة اليوم!", "error"); return; }
+    addToChat(q, 'user');
+    const lid = addToChat('<div class="loading-spinner"></div>', 'ai', true);
+    try {
+      const result = await analyzeWithModel(`السؤال: ${q}\n\nبناءً على المحتوى التالي:\n${currentContent.substring(0, 2200)}\nأجب بوضوح وبالتفصيل المناسب.`);
+      document.getElementById(lid)?.remove();
+      addToChat(result.result, 'ai');
+    } catch(e) { document.getElementById(lid)?.remove(); addToChat(`❌ ${e.message}`, 'ai'); }
+  };
+  
+  window.askQuestion = async function() {
+    const q = document.getElementById('chatInput').value.trim();
+    if (!q) return;
+    if (!currentContent) { showToast('ارفع ملفاً أولاً', 'error'); return; }
+    if (attemptsData.count <= 0) { showToast("⚠️ انتهت محاولات الترجمة اليوم!", "error"); return; }
+    addToChat(q, 'user');
+    document.getElementById('chatInput').value = '';
+    const lid = addToChat('<div class="loading-spinner"></div>', 'ai', true);
+    try {
+      const result = await analyzeWithModel(`السؤال: ${q}\n\nبناءً على المحتوى التالي:\n${currentContent.substring(0, 2200)}\nأجب بوضوح.`);
+      document.getElementById(lid)?.remove();
+      addToChat(result.result, 'ai');
+    } catch(e) { document.getElementById(lid)?.remove(); addToChat(`❌ ${e.message}`, 'ai'); }
+  };
+  
+  function addToChat(c, s, rid = false) {
+    const cont = document.getElementById('chatHistory');
+    const id = 'msg_' + Date.now();
+    const msg = document.createElement('div');
+    msg.id = rid ? id : undefined;
+    msg.className = `flex ${s === 'user' ? 'justify-end' : 'justify-start'} mb-2`;
+    msg.innerHTML = `<div class="${s === 'user' ? 'bg-blue-500 text-white' : 'bg-white border border-gray-200'} p-2 rounded-2xl max-w-[85%] shadow-sm text-sm">${c}</div>`;
+    cont.appendChild(msg);
+    cont.scrollTop = cont.scrollHeight;
+    return rid ? id : null;
+  }
+  
+  function loadData() {
+    if (!currentUser) return;
+    subjects = JSON.parse(localStorage.getItem(`sub_${currentUser}`) || "[]");
+    pdfFiles = JSON.parse(localStorage.getItem(`pdf_${currentUser}`) || "[]");
+    sessions = JSON.parse(localStorage.getItem(`ses_${currentUser}`) || "[]");
+    studyPlans = JSON.parse(localStorage.getItem(`plans_${currentUser}`) || "[]");
+    renderSubjectsWithPlans();
+    renderPdfsList();
+    renderSessions();
+    updateChart();
+    loadAttempts();
+  }
+  
+  function saveData() {
+    if (!currentUser) return;
+    localStorage.setItem(`sub_${currentUser}`, JSON.stringify(subjects));
+    localStorage.setItem(`pdf_${currentUser}`, JSON.stringify(pdfFiles));
+    localStorage.setItem(`ses_${currentUser}`, JSON.stringify(sessions));
+    localStorage.setItem(`plans_${currentUser}`, JSON.stringify(studyPlans));
+  }
+  
+  function saveAttempts() {
+    if (currentUser) localStorage.setItem(`attempts_${currentUser}`, JSON.stringify(attemptsData));
+  }
+  
+  function loadAttempts() {
+    if (currentUser) {
+      const saved = localStorage.getItem(`attempts_${currentUser}`);
+      if (saved) {
+        attemptsData = JSON.parse(saved);
+        const today = new Date().toISOString().slice(0,10);
+        if (attemptsData.date !== today) {
+          attemptsData = { date: today, count: 5 };
+          saveAttempts();
+        }
+      } else {
+        attemptsData = { date: new Date().toISOString().slice(0,10), count: 5 };
+        saveAttempts();
+      }
+    }
+    updateAttemptsDisplay();
+  }
+  
+  window.exportAllData = () => {
+    const d = JSON.stringify({ subjects, pdfFiles, sessions, studyPlans, user: currentUser });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([d]));
+    a.download = `data_${currentUser}_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    showToast('تم التصدير بنجاح');
+  };
+  
+  window.resetAllData = () => {
+    if (confirm('⚠️ تحذير: سيتم حذف جميع بياناتك نهائياً! هل أنت متأكد؟')) {
+      subjects = []; pdfFiles = []; sessions = []; studyPlans = [];
+      saveData();
+      loadData();
+      showToast('تم حذف جميع البيانات');
+    }
+  };
+  
+  function showToast(msg, type = 'success') {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    const icon = type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
+    t.innerHTML = `<i class="fas ${icon}"></i> ${msg}`;
+    document.body.appendChild(t);
+    setTimeout(() => t.classList.add('show'), 10);
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2500);
+  }
+  
+  function copyText(id) { 
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text); 
+    showToast('تم النسخ');
+  }
+  
+  window.downloadResearchPDF = function() {
+    const element = document.getElementById('researchContent');
+    if (!element || !element.innerHTML || element.innerHTML.trim() === '') { showToast('لا يوجد بحث للتحميل', 'error'); return; }
+    html2pdf().set({ margin: 0.75, filename: `بحث_${lastResearchTitle || 'غير_محدد'}_${new Date().toISOString().slice(0,10)}.pdf`, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(element).save();
+  };
+  
+  function getFunnyMessage(g) { return g === 'male' ? "أيوه يا زول! شد حيلك 😎" : "تعالي يا حبوبة! ورينا شطارتك 😘"; }
+  function getWelcomeMessage(n, g) { return g === 'male' ? `🎉 أول م جيت هنا ي فردة ${n} 🥲💔` : `🌸 ي البلولة ود عمك ${n} 😂💕`; }
+  function selectGender(g) { selectedGender = g; document.getElementById('genderMale').classList.toggle('selected', g === 'male'); document.getElementById('genderFemale').classList.toggle('selected', g === 'female'); document.getElementById('funnyMessage').innerHTML = `<i class="fas fa-${g === 'male' ? 'mars' : 'venus'}"></i> <span>${getFunnyMessage(g)}</span>`; }
+  
+  window.login = () => {
+    if (!selectedGender) { showToast('اختار جنسك', 'error'); return; }
+    let name = document.getElementById('loginName').value.trim() || 'الطالب';
+    currentUser = name;
+    document.getElementById('welcomeUser').innerHTML = getWelcomeMessage(name, selectedGender);
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    loadData();
+    showTab('pdfAssistant');
+    selectModel('cerebras');
+    selectTranslationType('normal');
+  };
+  
+  window.logout = () => { 
+    if (confirm('تسجيل الخروج؟')) {
+      currentUser = null; 
+      selectedGender = null; 
+      document.getElementById('authScreen').classList.remove('hidden'); 
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('loginName').value = '';
+    }
+  };
+  
+  function showTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.getElementById(tab + 'Section')?.classList.remove('hidden');
+    document.querySelectorAll('.nav-item').forEach((btn, i) => {
+      btn.classList.remove('active');
+      const tabs = ['pdfAssistant', 'study', 'research', 'stats'];
+      if (tabs[i] === tab) btn.classList.add('active');
+    });
+    if (tab === 'study') updateChart();
+  }
+  
+  function escapeHtml(s) { if (!s) return ''; return String(s).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+  
+  function initChart() {
+    let ctx = document.getElementById('studyChart');
+    if (ctx) studyChart = new Chart(ctx, { type: 'bar', data: { labels: [], datasets: [{ label: 'ساعات المذاكرة', data: [], backgroundColor: '#3b82f6', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: true } });
+  }
+  
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  initChart();
+  window.showTab = showTab;
+  window.addSubject = addSubject;
+  window.addStudyPlan = addStudyPlan;
+  window.recordSession = recordSession;
+  window.deleteSubject = deleteSubject;
+  window.deleteStudyPlan = deleteStudyPlan;
+  window.continueResearch = continueResearch;
+  window.generateResearch = generateResearch;
+</script>
+</body>
+</html>
